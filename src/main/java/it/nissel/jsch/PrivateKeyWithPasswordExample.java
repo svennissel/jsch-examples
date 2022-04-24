@@ -12,11 +12,13 @@ import org.apache.commons.vfs2.provider.sftp.SftpFileSystemConfigBuilder;
 import java.io.File;
 import java.util.Arrays;
 
-public class PrivateKeyNoPasswordExample {
+public class PrivateKeyWithPasswordExample {
   public static void main(String[] args) throws FileSystemException {
-    String user = args[0]; // username
-    String sshKey = args[1];// C:\private.ppk
-    String url = args[2];// sftp://domain.com/path
+    String url = args[0];// sftp://domain.com/path
+    String user = args[1]; // username
+    String sshKey = args[2];// C:\private.ppk
+    String passwordKeyFile = args[3]; //Password to open private keyfile
+
 
     try (StandardFileSystemManager fm = new StandardFileSystemManager()) {
       fm.init();
@@ -28,8 +30,8 @@ public class PrivateKeyNoPasswordExample {
       builder.setCompression(options, "zlib,none");
       builder.setDisableDetectExecChannel(options, true); // see https://issues.apache.org/jira/browse/VFS-818
 
-      //Set private key not protected with password
-      SftpFileSystemConfigBuilder.getInstance().setIdentityProvider(options, new IdentityInfo(new File(sshKey)));
+      //Set private key with protected password
+      SftpFileSystemConfigBuilder.getInstance().setIdentityProvider(options, new IdentityInfo(new File(sshKey), passwordKeyFile.getBytes()));
 
       DefaultFileSystemConfigBuilder.getInstance().setUserAuthenticator(options, types -> {
         UserAuthenticationData userAuthenticationData = new UserAuthenticationData();
